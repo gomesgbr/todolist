@@ -1,6 +1,7 @@
 package com.todolist.todo.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,17 +21,16 @@ import com.todolist.todo.dtos.ToDoDTO;
 import com.todolist.todo.models.ToDo;
 import com.todolist.todo.service.ToDoService;
 
-
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/toDo")
 public class ToDoController {
-    
+
     @Autowired
     ToDoService toDoService;
 
     @PostMapping
-    public ResponseEntity<Object> saveToDo(@RequestBody @Valid ToDoDTO toDoDTO){
+    public ResponseEntity<Object> saveToDo(@RequestBody @Valid ToDoDTO toDoDTO) {
         var toDo = new ToDo();
         BeanUtils.copyProperties(toDoDTO, toDo);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDoService.save(toDo));
@@ -39,5 +40,15 @@ public class ToDoController {
     public ResponseEntity<List<ToDo>> getAllToDo() {
         return ResponseEntity.status(HttpStatus.OK).body(toDoService.findAll());
     }
-    
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getToDoById(@PathVariable(value = "id") int id) {
+        Optional<ToDo> toDoOpt = toDoService.findById(id);
+        if (!toDoOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+        }
+
+        return ResponseEntity.ok().body(toDoOpt.get());
+    }
+
 }
