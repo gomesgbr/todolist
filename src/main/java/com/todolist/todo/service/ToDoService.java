@@ -30,6 +30,10 @@ public class ToDoService {
     public Optional<ToDo> findById(int id){
       return toDoRepository.findById(id);
     }
+
+    public void deleteById(int id){
+      toDoRepository.deleteById(id);
+    }
 }
 
 
